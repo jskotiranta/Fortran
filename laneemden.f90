@@ -5,15 +5,15 @@ REAL :: n,ksi1,psi1,theta1,thetamin,thetamax,ksimin,ksimax,rhomin,rhomax,pmin,pm
 INTEGER, PARAMETER :: pistlkm = 10000
 REAL, PARAMETER :: Pi = 3.1415, G = 6.67259E-11
 REAL, DIMENSION(pistlkm) :: ksitau,psitau,thetatau,rhotau,ptau,ttau,mtau
-WRITE(*,*) 'Sy√∂t√§ n:n arvo'
+WRITE(*,*) 'Syˆt‰ n:n arvo'
 READ(*,*) n
 WRITE(*,*) 'Syota tiheys keskustassa'
 READ(*,*) rho0
-WRITE(*,*) 'Sy√∂t√§ paine keskustassa'
+WRITE(*,*) 'Syˆt‰ paine keskustassa'
 READ(*,*) p0
-WRITE(*,*) 'Sy√∂t√§ t√§hden massa'
+WRITE(*,*) 'Syˆt‰ t‰hden massa'
 READ(*,*) massa
-WRITE(*,*) 'Sy√∂t√§ l√§mp√∂tila keskustassa'
+WRITE(*,*) 'Syˆt‰ l‰mpˆtila keskustassa'
 READ(*,*) t0
 ksi1 = 0.0001; psi1 = 0.0001; theta1 = 1.0
 
@@ -21,9 +21,14 @@ CALL r_k4(n,ksi1,psi1,theta1,pistlkm,ksitau,psitau,thetatau)
 
 !Suureiden yhteydet thetaan
 gamma = (1 / (n+0.001)) + 1
+!K = ptau(1) / rhotau(1)**gamma
+!sade = ((n + 1)*K/(4*Pi*G)) * rho0**((1-n)/(2*(n+0.001))) * ksitau(10000)
+!p0 = G * massa**2 / sade**4 * (4 * Pi * (n+1) * psitau(10000)**2)**(-1)
 rhotau = rho0 * thetatau**n
 ptau = p0 * thetatau**(n + 1)
 ttau = t0 * thetatau
+!mtau!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
  ksimin = 0.0001
  ksimax = Pi
@@ -86,7 +91,7 @@ CONTAINS
   Dpsitulos = -2.0 * psi / ksi - theta**n
  END FUNCTION Dpsi
 
-!Runge-Kutta iskee j√§lleen
+!Runge-Kutta iskee j‰lleen
 SUBROUTINE r_k4(n,ksi1,psi1,theta1,pistlkm,ksitau,psitau,thetatau)
   IMPLICIT NONE
   REAL, INTENT(IN) :: n, ksi1, psi1, theta1
@@ -99,11 +104,11 @@ SUBROUTINE r_k4(n,ksi1,psi1,theta1,pistlkm,ksitau,psitau,thetatau)
   ksitau(1) = ksi1 ; psitau(1) = psi1; thetatau(1) = theta1
   askel = Pi / 10000
 
-  !Nelj√§nnen kertaluvun Runge-Kutta algoritmi
+  !Nelj‰nnen kertaluvun Runge-Kutta algoritmi
   DO i = 1, (pistlkm - 1)
   ksitau(i + 1) = ksitau(i) + askel
 
-   !Ensimm√§iset gradientit saadaan i:nnest√§ "alkuarvosta":
+   !Ensimm‰iset gradientit saadaan i:nnest‰ "alkuarvosta":
    kx1 = askel * Dtheta(thetatau(i), psitau(i), ksitau(i), n)
    ky1 = askel * Dpsi(thetatau(i), psitau(i), ksitau(i), n)
 
@@ -116,11 +121,14 @@ SUBROUTINE r_k4(n,ksi1,psi1,theta1,pistlkm,ksitau,psitau,thetatau)
    kx4 = askel * Dtheta(thetatau(i) + kx3, psitau(i) + ky3, ksitau(i) + askel, n)
    ky4 = askel * Dpsi(thetatau(i) + kx3, psitau(i) + ky3, ksitau(i) + askel, n)
 
-   !Lopuksi gradienteist√§ saadaan lasketuksi (i + 1):nnet "alkuarvot":
+   !Lopuksi gradienteist‰ saadaan lasketuksi (i + 1):nnet "alkuarvot":
    thetatau(i + 1) = (thetatau(i) + (kx1 + 2.0 * kx2 + 2.0 * kx3 + kx4) / 6.0)
    psitau(i + 1) = (psitau(i) + (ky1 + 2.0 * ky2 + 2.0 * ky3 + ky4) / 6.0)
   END DO
 
  END SUBROUTINE r_k4
+
+
+
 
 END PROGRAM laneemden
